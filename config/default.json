@@ -1,0 +1,13 @@
+{
+    "MONGO": {
+        "URI": "mongodb://localhost:27017/bitsong"
+    },
+    "RPC": "http://rpc.testnet-1.bitsong.network",
+    "LCD": "http://lcd.testnet-1.bitsong.network",
+    "PARSER": {
+        "DELAYS": {
+            "FORWARD": ""
+        },
+        "MAX_CONCURRENT_BLOCKS": "1"
+    }
+}

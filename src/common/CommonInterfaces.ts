@@ -1,7 +1,7 @@
 export interface ITransaction {
     hash: string,
-    height: number,
     msgs: any[],
+    height: number,
     time: string
 }
 

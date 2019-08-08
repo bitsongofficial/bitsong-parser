@@ -21,8 +21,23 @@ const transactionSchema = new Schema({
     },
     msgs: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Messages"
+        ref: "Message"
     }],
+    status: {
+        type: Boolean,
+        required: true
+    },
+    gas_wanted: {
+        type: Number,
+        required: true,
+        index: true
+    },
+    gas_used: {
+        type: Number,
+        required: true,
+        index: true
+    },
+    fee_amount: [],
     time: {
         type: Date,
         required: true

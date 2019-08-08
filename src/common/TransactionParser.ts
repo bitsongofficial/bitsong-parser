@@ -1,10 +1,6 @@
 import * as winston from "winston";
 import { Transaction } from "../models/TransactionModel";
-import { ITransaction, IBlock } from "./CommonInterfaces";
-
-import { Config } from "./Config";
-import * as Bluebird from "bluebird";
-import { Block } from "../models/BlockModel";
+import { ITransaction } from "./CommonInterfaces";
 import { Bitsong } from "../services/Bitsong"
 
 export class TransactionParser {
@@ -26,92 +22,63 @@ export class TransactionParser {
 
     async extractTransactions(hashes: any): Promise<any> {
         const transactions = [];
+        const rawTransactions = [];
 
         await Promise.all(
             hashes.flatMap(async (hash: any) => {
                 await Bitsong.getTxByHash(hash).then((transaction: any) => {
                     const data = this.extractTransactionData(transaction)
+
+                    rawTransactions.push(data)
                     transactions.push(new Transaction(data))
                 })
             })
         );
 
-        return transactions
+        return [transactions, rawTransactions]
     }
 
     public async parseTransactions(blocks: any) {
         if (blocks.length === 0) return Promise.resolve();
 
         const extractedHashes = await this.extractHash(blocks);
-        const extractedTransactions = await this.extractTransactions(extractedHashes);
-
-        extractedTransactions.forEach((transaction: ITransaction) => {
-            console.log(transaction)
-            Transaction.findOneAndUpdate({hash: transaction.hash}, transaction, {upsert: true, new: true})
-            .then((transaction: any) => {
-                return transaction;
-            })
-        })
-
-        return Promise.resolve(extractedTransactions);
-
-        /*const extractedHashes = blocks.flatMap((block: any) => {
-            return Bitsong.getTxsByBlock(block.block_meta.header.height);
-        });
-
-        const extractedTransactions = extractedHashes.forEach((blocks: any) => {
-            blocks.forEach((transactions: any) => {
-                return transactions.flatMap((transaction: any) => {
-                    return Promise.resolve(transaction.hash)
-                })
-            })
-        });
-
-        Promise.all(extractedTransactions).then((data: any) => {})
-
-        console.log(extractedTransactions)*/
-
-        /*const extractedTransactions = blocks.flatMap((block: any) => {
-            return Bitsong.getTxsByBlock(block.block_meta.header.height).then((transactions: any) => {
-                transactions.forEach((transaction: any) => {
-                    return Bitsong.getTxByHash(transaction.hash).then((data: any) => {
-                        const tx = this.extractTransactionData(data)
-                        console.log(tx)
-                        return new Transaction(tx);
-                    })
-                })
-            })
-            // fetch txs hash from rpc tx_search?query="tx.height=72"
-            // fetch all tx data by hash
-            // store to mongodb
-
-            
-        });
+        const [extractedTransactions, extractedTransactionsRaw] = await this.extractTransactions(extractedHashes);
 
         const bulkTransactions = Transaction.collection.initializeUnorderedBulkOp();
 
         extractedTransactions.forEach((transaction: ITransaction) => {
-            console.log(transaction)
+            bulkTransactions.find({hash: transaction.hash}).upsert().replaceOne(transaction)
+        });
+
+        if (bulkTransactions.length === 0) return Promise.resolve();
+
+        return bulkTransactions.execute().then((bulkResult: any) => {
+            return Promise.resolve(extractedTransactionsRaw);
+        });
+
+        /*extractedTransactions.forEach((transaction: ITransaction) => {
+            delete transaction.msgs
+
             Transaction.findOneAndUpdate({hash: transaction.hash}, transaction, {upsert: true, new: true})
             .then((transaction: any) => {
                 return transaction;
             })
         })
+
+        winston.info("Processed " + extractedTransactions.length + " transactions.");
 
         return Promise.resolve(extractedTransactions);*/
     }
 
     extractTransactionData(transaction: any) {
-        //const from = String(transaction.from).toLowerCase();
-        //console.log(transaction)
-        //const to: string = transaction.to === null ? "" : String(transaction.to).toLowerCase();
-        //const addresses: string[] = to ? [from, to] : [from];
-
         return {
             hash: String(transaction.txhash),
             height: Number(transaction.height),
+            status: Boolean(transaction.logs.success),
             msgs: transaction.tx.value.msg,
-            //type: String(transaction.events[0].type), // fix cosmos-sdk 0.36
+            gas_wanted: Number(transaction.gas_wanted),
+            gas_used: Number(transaction.gas_used),
+            fee_amount: transaction.tx.value.fee.amount,
             time: String(transaction.timestamp)
         };
     }

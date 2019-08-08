@@ -3,6 +3,7 @@ import { BlockchainState } from "./BlockchainState";
 import { LastParsedBlock } from "../models/LastParsedBlockModel";
 import { BlockParser } from "./BlockParser";
 import { TransactionParser } from "./TransactionParser";
+import { MessageParser } from "./MessageParser";
 import { Bitsong } from "../services/Bitsong"
 import { Config } from "./Config";
 import { setDelay } from "./Utils";
@@ -13,12 +14,14 @@ export class BlockchainParser {
 
     private blockParser: BlockParser;
     private transactionParser: TransactionParser;
+    private messageParser: MessageParser;
     private maxConcurrentBlocks: number = parseInt(config.get("PARSER.MAX_CONCURRENT_BLOCKS")) || 2;
     private forwardParsedDelay: number = parseInt(config.get("PARSER.DELAYS.FORWARD")) || 100;
 
     constructor() {
         this.blockParser = new BlockParser();
         this.transactionParser = new TransactionParser();
+        this.messageParser = new MessageParser();
     }
 
     public start() {
@@ -99,7 +102,7 @@ export class BlockchainParser {
         }).then((blocks: any) => {
             return this.transactionParser.parseTransactions(this.flatBlocksWithMissingTransactions(blocks));
         }).then((transactions: any) => {
-            //return this.accountParser.parseAccounts(transactions);
+            return this.messageParser.parseMessages(transactions);
         }).then((transactions: any) => {
             //return this.coinParser.parseCoins(transactions);
         }).then(() => {

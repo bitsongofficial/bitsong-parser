@@ -17,4 +17,18 @@ export class Bitsong {
                 return response.data.result
             })
     }
+
+    static getTxsByBlock(blockId: Number): Promise<any> {
+        return axios.get(config.get("RPC") + '/tx_search?query="tx.height=' + blockId + '"')
+            .then((response) => {
+                return response.data.result.txs
+            })
+    }
+
+    static getTxByHash(hash: String): Promise<any> {
+        return axios.get(config.get("LCD") + '/txs/' + hash)
+            .then((response) => {
+                return response.data
+            })
+    }
 }

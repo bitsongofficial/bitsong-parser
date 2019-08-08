@@ -30,6 +30,8 @@ const blockSchema = new Schema({
         required: true,
     }
 }, {
+    _id: false,
+    id: false,
     versionKey: false,
     toObject: {
         virtuals: true

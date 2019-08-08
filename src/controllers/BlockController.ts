@@ -27,13 +27,9 @@ export class BlockController {
         Block.paginate(query, {
             page: queryParams.page,
             limit: queryParams.limit,
-            sort: {timeStamp: -1},
-            populate: {
-                path: "transactions",
-                model: "Transaction"
-            }
-        }).then((transactions: any) => {
-            sendJSONresponse(res, 200, transactions);
+            sort: {time: -1},
+        }).then((blocks: any) => {
+            sendJSONresponse(res, 200, blocks);
         }).catch((err: Error) => {
             sendJSONresponse(res, 404, err);
         });

@@ -19,16 +19,17 @@ const transactionSchema = new Schema({
         required: true,
         index: true
     },
-    type: {
-        type: String,
-        required: true,
-        index: true
-    },
+    msgs: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Messages"
+    }],
     time: {
         type: Date,
         required: true
     }
 }, {
+    _id: false,
+    id: false,
     versionKey: false,
     toObject: {
          virtuals: true

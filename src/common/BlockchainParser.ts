@@ -97,7 +97,7 @@ export class BlockchainParser {
 
             return blocks;
         }).then((blocks: any) => {
-            //return this.transactionParser.parseTransactions(this.flatBlocksWithMissingTransactions(blocks));
+            return this.transactionParser.parseTransactions(this.flatBlocksWithMissingTransactions(blocks));
         }).then((transactions: any) => {
             //return this.accountParser.parseAccounts(transactions);
         }).then((transactions: any) => {
@@ -116,7 +116,7 @@ export class BlockchainParser {
 
     private flatBlocksWithMissingTransactions(blocks: any) {
         return blocks
-            .map((block: any) => (block !== null && block.transactions !== null && block.transactions.length > 0)
+            .map((block: any) => (block !== null && block.block.data.txs !== null)
                 ? [block]
                 : [])
             .reduce( (a: any, b: any) => a.concat(b), [] );

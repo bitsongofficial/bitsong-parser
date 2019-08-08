@@ -1,8 +1,8 @@
 export interface ITransaction {
-    hash: String,
-    height: Number,
-    type: String,
-    time: Date
+    hash: string,
+    height: number,
+    msgs: any[],
+    time: string
 }
 
 export interface IBlock {

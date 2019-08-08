@@ -10,15 +10,12 @@ export class MessageParser {
         if (transactions.length === 0) return Promise.resolve();
 
         transactions.forEach((transaction: ITransaction) => {
-            console.log(transaction)
             const messages = transaction.msgs
-            //if (messages.length === 0) return Promise.resolve();
-            console.log(messages)
+            if (messages.length === 0) return Promise.resolve();
 
             messages.forEach((message: any) => {
                 Message.findOneAndUpdate({tx_hash: transaction.hash}, message, {upsert: true, new: true})
                     .then((message: any) => {
-                        console.log(message)
                         return Transaction.findOneAndUpdate({hash: transaction.hash}, {$push: {msgs: message._id}})
                     .catch((error: Error) => {
                         winston.error(`Could not update message to transaction hash ${transaction.hash} with error: ${error}`);
@@ -28,13 +25,8 @@ export class MessageParser {
                 })
             })
 
-            /*Transaction.findOneAndUpdate({hash: transaction.hash}, transaction, {upsert: true, new: true})
-            .then((transaction: any) => {
-                return transaction;
-            })*/
+            winston.info("Processed " + messages.length + " messages.");
         })
-
-        //winston.info("Processed " + extractedTransactions.length + " transactions.");
 
         return Promise.resolve(transactions);
     }

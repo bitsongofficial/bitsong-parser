@@ -53,21 +53,10 @@ export class TransactionParser {
         if (bulkTransactions.length === 0) return Promise.resolve();
 
         return bulkTransactions.execute().then((bulkResult: any) => {
+            winston.info("Processed " + extractedTransactions.length + " transactions.");
+
             return Promise.resolve(extractedTransactionsRaw);
         });
-
-        /*extractedTransactions.forEach((transaction: ITransaction) => {
-            delete transaction.msgs
-
-            Transaction.findOneAndUpdate({hash: transaction.hash}, transaction, {upsert: true, new: true})
-            .then((transaction: any) => {
-                return transaction;
-            })
-        })
-
-        winston.info("Processed " + extractedTransactions.length + " transactions.");
-
-        return Promise.resolve(extractedTransactions);*/
     }
 
     extractTransactionData(transaction: any) {

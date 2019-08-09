@@ -15,8 +15,8 @@ router.get("/", statusController.getStatus);
 router.get("/blocks", blockController.readAllBlocks);
 
 // URLs for transactions
-router.get("/transactions", transactionController.readAllTransactions);
-router.get("/transactions/:transactionId", transactionController.readOneTransaction);
+router.get("/txs", transactionController.readAllTransactions);
+router.get("/txs/:hash", transactionController.readOneTransaction);
 
 export {
     router

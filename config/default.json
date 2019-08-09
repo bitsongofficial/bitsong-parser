@@ -2,10 +2,10 @@
     "MONGO": {
         "URI": "mongodb://localhost:27017/bitsong"
     },
-    //"RPC": "http://rpc.testnet-1.bitsong.network",
-    //"LCD": "http://lcd.testnet-1.bitsong.network",
-    "RPC": "http://116.203.192.32:26657", // kava rpc
-    "LCD": "http://116.203.192.32:1317", // kava lcd
+    "RPC": "http://rpc.testnet-1.bitsong.network",
+    "LCD": "http://lcd.testnet-1.bitsong.network",
+    //"RPC": "http://116.203.192.32:26657", // kava rpc
+    //"LCD": "http://116.203.192.32:1317", // kava lcd
     "PARSER": {
         "DELAYS": {
             "FORWARD": ""

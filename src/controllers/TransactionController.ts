@@ -21,17 +21,14 @@ export class TransactionController {
         
         // build up query
         const query: any = {};
-        /*if (queryParams.address !== undefined) {
-            const address: string = queryParams.address.toLowerCase();
-            query.addresses = { "$in": [address] };
-        }*/
-        query.block_number = { "$gte": queryParams.startBlock, "$lte": queryParams.endBlock};
-        const address: string = queryParams.address.toLowerCase();
 
         Transaction.paginate(query, {
             page: queryParams.page,
             limit: queryParams.limit,
-            sort: {timeStamp: -1}
+            sort: {time: -1},
+            populate: {
+                path: "msgs"
+            }
         }).then((transactions: any) => {
             sendJSONresponse(res, 200, transactions);
         }).catch((err: Error) => {
@@ -41,32 +38,32 @@ export class TransactionController {
     }
 
     public readOneTransaction(req: Request, res: Response) {
-        if (!req.params || !req.params.transactionId) {
-            sendJSONresponse(res, 404, { "message": "No transaction ID in request" });
+        if (!req.params || !req.params.hash) {
+            sendJSONresponse(res, 404, { "message": "No Hash in request" });
             return;
         }
 
         // validate transaction ID
-        req.checkParams("transactionId", "Transaction ID must be alphanumeric").isAlphanumeric();
+        //req.checkParams("transactionId", "Transaction ID must be alphanumeric").isAlphanumeric();
         const validationErrors = req.validationErrors();
         if (validationErrors) {
             sendJSONresponse(res, 400, validationErrors);
             return;
         }
 
-        const transactionId = xss.inHTMLData(req.params.transactionId);
+        const tx_hash = xss.inHTMLData(req.params.hash);
 
         Transaction.findOne({
-            _id: transactionId
+            hash: tx_hash
         }).populate({
-            path: "operations",
+            path: "msgs",
             populate: {
-                path: "contract",
-                model: "ERC20Contract"
+                path: "msgs",
+                model: "Message"
             }
         }).exec().then((transaction: any) => {
             if (!transaction) {
-                sendJSONresponse(res, 404, {"message": "transaction ID not found"});
+                sendJSONresponse(res, 404, {"message": "transaction Hash not found"});
                 return;
             }
             sendJSONresponse(res, 200, transaction);

@@ -2,6 +2,7 @@ import * as winston from "winston";
 import { Transaction } from "../models/TransactionModel";
 import { ITransaction } from "./CommonInterfaces";
 import { Bitsong } from "../services/Bitsong"
+import { sha256 } from 'js-sha256';
 
 export class TransactionParser {
     async extractHash(blocks: any): Promise<any> {
@@ -9,10 +10,10 @@ export class TransactionParser {
 
         await Promise.all(
             blocks.flatMap(async (block: any) => {
-                await Bitsong.getTxsByBlock(block.block_meta.header.height).then((transactions: any) => {
-                    transactions.forEach((transaction: any) => {
-                        hashes.push(transaction.hash)
-                    })
+                const txs = block.block.data.txs
+                txs.forEach((tx: any) => {
+                    const hash = sha256(Buffer.from(tx, 'base64')).toUpperCase()
+                    hashes.push(hash)
                 })
             })
         );

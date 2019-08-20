@@ -6,9 +6,13 @@ export interface ITransaction {
 }
 
 export interface IBlock {
-    height: Number
+    height: Number,
     hash: String,
     time: Date,
     num_txs: Number,
     proposer: String
+}
+
+export interface IValidator {
+    height: Number
 }

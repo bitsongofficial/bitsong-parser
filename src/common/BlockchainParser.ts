@@ -2,6 +2,7 @@ import * as winston from "winston";
 import { BlockchainState } from "./BlockchainState";
 import { LastParsedBlock } from "../models/LastParsedBlockModel";
 import { BlockParser } from "./BlockParser";
+import { ValidatorParser } from "./ValidatorParser";
 import { TransactionParser } from "./TransactionParser";
 import { MessageParser } from "./MessageParser";
 import { Bitsong } from "../services/Bitsong"
@@ -13,6 +14,7 @@ const config = require("config");
 export class BlockchainParser {
 
     private blockParser: BlockParser;
+    private validatorParser: ValidatorParser;
     private transactionParser: TransactionParser;
     private messageParser: MessageParser;
     private maxConcurrentBlocks: number = parseInt(config.get("PARSER.MAX_CONCURRENT_BLOCKS")) || 2;
@@ -20,6 +22,7 @@ export class BlockchainParser {
 
     constructor() {
         this.blockParser = new BlockParser();
+        this.validatorParser = new ValidatorParser();
         this.transactionParser = new TransactionParser();
         this.messageParser = new MessageParser();
     }
@@ -99,6 +102,8 @@ export class BlockchainParser {
             this.blockParser.parseBlocks(blocks);
 
             return blocks;
+        }).then((blocks: any) => {
+            return this.validatorParser.parseValidators(blocks)
         }).then((blocks: any) => {
             return this.transactionParser.parseTransactions(this.flatBlocksWithMissingTransactions(blocks));
         }).then((transactions: any) => {

@@ -11,24 +11,46 @@ export class Bitsong {
             })
     }
 
-    static getValidators(): Promise<any> {
-        let validatorSet = {}
-        let res = axios.get(config.get("LCD") + '/staking/validators').then((response) => {
-            //JSON.parse(JSON.stringify(response.data.result)).forEeach((validator) => console.log(validator))  
-            
-
-            let validators = JSON.stringify(response.data.result)
-            let validator2 = JSON.parse(validators)
-            validator2.forEeach((val) => console.log(val))
-            //console.log(validator2)
+    static getValidators(blockHeight: Number): Promise<any> {
+        return axios.get(config.get("RPC") + '/validators?height=' + blockHeight).then((response) => {
+            return response.data.result
         })
-        
-        console.log(validatorSet)
-        return res
-        /*return axios.get(config.get("LCD") + '/staking/validators')
-            .then((response) => {
-                return response.data.result.sync_info.latest_block_height
-            })*/
+    }
+
+    static async getValidatorSet(): Promise<any> {
+        let validatorSet = []
+
+        await axios.get(config.get("LCD") + '/staking/validators').then((response) => {
+            let validators = JSON.parse(JSON.stringify(response.data.result))
+
+            for (var i in validators) {
+                let validator = validators[i]
+
+                validatorSet[validator.consensus_pubkey] = validator
+            }
+        })
+
+        await axios.get(config.get("LCD") + '/staking/validators?status=unbonded').then((response) => {
+            let validators = JSON.parse(JSON.stringify(response.data.result))
+
+            for (var i in validators) {
+                let validator = validators[i]
+
+                validatorSet[validator.consensus_pubkey] = validator
+            }
+        })
+
+        await axios.get(config.get("LCD") + '/staking/validators?status=unbonded').then((response) => {
+            let validators = JSON.parse(JSON.stringify(response.data.result))
+
+            for (var i in validators) {
+                let validator = validators[i]
+
+                validatorSet[validator.consensus_pubkey] = validator
+            }
+        })
+
+        return Promise.all([validatorSet]);
     }
 
     static getBlock(blockId: Number): Promise<any> {

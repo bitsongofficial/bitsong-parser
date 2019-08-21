@@ -27,6 +27,9 @@ const validatorSchema = new Schema({
         type: String,
         required: true,
         index: true
+    },
+    profile_url: {
+        type: String
     }
 }, {
     _id: false,

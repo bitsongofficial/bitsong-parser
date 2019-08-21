@@ -12,9 +12,10 @@ export class Bitsong {
     }
 
     static getValidators(blockHeight: Number): Promise<any> {
-        return axios.get(config.get("RPC") + '/validators?height=' + blockHeight).then((response) => {
-            return response.data.result
-        })
+        return axios.get(config.get("RPC") + '/validators?height=' + blockHeight)
+            .then((response) => {
+                return response.data.result
+            })
     }
 
     static async getValidatorSet(): Promise<any> {

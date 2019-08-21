@@ -12,8 +12,7 @@ export class TransactionParser {
             blocks.flatMap(async (block: any) => {
                 const txs = block.block.data.txs
                 txs.forEach((tx: any) => {
-                    const hash = sha256(Buffer.from(tx, 'base64')).toUpperCase()
-                    hashes.push(hash)
+                    hashes.push(sha256(Buffer.from(tx, 'base64')).toUpperCase())
                 })
             })
         );

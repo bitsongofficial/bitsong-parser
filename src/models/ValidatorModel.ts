@@ -17,6 +17,10 @@ const validatorSchema = new Schema({
     type: Number,
     required: true
   },
+  proposer_priority: {
+    type: Number,
+    required: true
+  },
   uptime: {
     type: Schema.Types.ObjectId,
     ref: "Uptime"
@@ -79,13 +83,12 @@ const validatorSchema = new Schema({
       }
     }
   }
+}, {
+  versionKey: false,
 });
 
-validatorSchema.virtual("success").get(function() {
-  if (this.hasOwnProperty("error")) {
-    return this.error === "";
-  }
-});
+// indices
+validatorSchema.index({address: 1}, {name: "validatorAddressIndex"});
 
 validatorSchema.plugin(mongoosePaginate);
 

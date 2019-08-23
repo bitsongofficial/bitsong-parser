@@ -10,6 +10,6 @@
         "DELAYS": {
             "FORWARD": ""
         },
-        "MAX_CONCURRENT_BLOCKS": "2"
+        "MAX_CONCURRENT_BLOCKS": "20"
     }
 }

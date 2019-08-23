@@ -1,5 +1,4 @@
 import axios from "axios";
-import fetch from "isomorphic-fetch";
 
 const config = require("config");
 

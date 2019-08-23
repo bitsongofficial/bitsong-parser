@@ -41,64 +41,82 @@ export class ValidatorParser {
   }
 
   async parseBlock(block: number): Promise<any> {
+    if (block < 1) return Promise.resolve();
     try {
       const bulkValidators = Validator.collection.initializeUnorderedBulkOp();
       const validatorList = await Bitsong.getValidators(block);
       const validatorSet = await Bitsong.getValidatorSet();
 
-      if (block > 1) {
-        for (var i in validatorList.validators) {
-          const validatorRaw = validatorList.validators[i];
-          const validatorRawData = validatorSet.find(
-            v =>
-              v.consensus_pubkey ===
-              this.pubkeyToBech32(validatorRaw.pub_key, "bitsongvalconspub")
-          );
+      for (var i in validatorList.validators) {
+        const validatorRaw = validatorList.validators[i];
+        const validatorRawData = validatorSet.find(
+          v =>
+            v.consensus_pubkey ===
+            this.pubkeyToBech32(validatorRaw.pub_key, "bitsongvalconspub")
+        );
 
-          const validator = this.extractValidatorData(
-            validatorRaw,
-            validatorRawData
-          );
+        const validator = this.extractValidatorData(
+          validatorRaw,
+          validatorRawData
+        );
 
-          // Update profile pic each........
-          if (block % 10 === 0) {
-            if (validator.details.description.identity) {
-              winston.info("Processing profile url validators");
+        if (block % 1440 === 0) {
+          if (validator.details.description.identity) {
+            winston.info("Processing profile url validators");
 
-              const profileurl = await this.getValidatorProfileUrl(
-                validator.details.description.identity
-              );
-              validator.details.description.profile_url = profileurl;
-            }
-            console.log(validator);
+            const profileurl = await this.getValidatorProfileUrl(
+              validator.details.description.identity
+            );
+
+            bulkValidators
+              .find({address: validator.address})
+              .updateOne({"$set": {
+                "details.description.profile_url": profileurl
+              }});
           }
-
-          bulkValidators
-            .find({ consensus_pubkey: validator.details.consensusPubKey })
-            .upsert()
-            .updateOne({ $set: validator });
         }
 
-        if (bulkValidators.length === 0)
-          return Promise.reject(`error in validators`);
-
-        return bulkValidators.execute().then((bulkResult: any) => {
-          winston.info("Processed block validators");
-
-          //return Promise.resolve(block);
-        });
+        bulkValidators
+          .find({address: validator.address})
+          .upsert()
+          .updateOne({"$set": {
+            "address": validator.address,
+            "voting_power": validator.voting_power,
+            "proposer_priority": validator.proposer_priority,
+            "details.operatorAddress": validator.details.operatorAddress,
+            "details.consensusPubKey": validator.details.consensusPubKey,
+            "details.jailed": validator.details.jailed,
+            "details.status": validator.details.status,
+            "details.tokens": validator.details.tokens,
+            "details.delegatorShares": validator.details.delegatorShares,
+            "details.description.moniker": validator.details.description.moniker,
+            "details.description.identity": validator.details.description.identity,
+            "details.description.website": validator.details.description.website,
+            "details.description.details": validator.details.description.details,
+            "details.commission.rate": validator.details.commission.rate,
+            "details.commission.maxRate": validator.details.commission.maxRate,
+            "details.commission.maxChangeRate": validator.details.commission.maxChangeRate,
+            "details.commission.updateTime": validator.details.commission.updateTime,
+          }});
       }
+
+      if (bulkValidators.length === 0)
+        return Promise.reject(`error in validators`);
+      
+        await bulkValidators.execute()
+      //winston.info("Processed block validators");
     } catch (err) {
       throw err;
     }
   }
 
-  extractValidatorData(validatorRaw: any, validatorData: any): IValidator {
+  extractValidatorData(validatorRaw: any, validatorData: any) {
     if (!validatorRaw && !validatorData) return;
 
     return {
       address: validatorRaw.address,
       voting_power: parseInt(validatorRaw.voting_power),
+      proposer_priority: parseInt(validatorRaw.proposer_priority),
       details: {
         operatorAddress: validatorData.operator_address,
         consensusPubKey: validatorData.consensus_pubkey,

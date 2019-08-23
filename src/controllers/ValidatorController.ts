@@ -25,7 +25,7 @@ export class ValidatorController {
         Validator.paginate(query, {
             page: queryParams.page,
             limit: queryParams.limit,
-            sort: {"voting_power": -1}
+            sort: {"details.description.identity": -1}
         }).then((validators: any) => {
             sendJSONresponse(res, 200, validators);
         }).catch((err: Error) => {

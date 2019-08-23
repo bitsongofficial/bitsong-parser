@@ -6,6 +6,7 @@ import { IValidator } from "./CommonInterfaces";
 import { Bitsong } from "../services/Bitsong";
 import { getAddress } from "tendermint/lib/pubkey";
 import * as BluebirdPromise from "bluebird";
+import _ from "lodash";
 
 const config = require("config");
 
@@ -55,7 +56,7 @@ export class ValidatorParser {
 
       const validatorSet = await Bitsong.getValidatorSet();
 
-      validatorSet.forEach(async (validatorRawData: any) => {
+      for (const validatorRawData of validatorSet) {
         const validatorRaw = validatorList.validators.find(v => v.pub_key.bech32 === validatorRawData.consensus_pubkey)
 
         if (typeof validatorRaw !== 'undefined') {
@@ -75,10 +76,6 @@ export class ValidatorParser {
   
               bulkValidators.find({address: validator.address}).updateOne({"$set": {"details.description.profile_url": profileurl}});
             }
-          }
-
-          if (bulkValidators.length > 0) {
-            await bulkValidators.execute()
           }
 
           bulkValidators
@@ -104,8 +101,7 @@ export class ValidatorParser {
               "details.commission.updateTime": validator.details.commission.updateTime,
             }});
         }
-        
-      })
+      }
 
       if (bulkValidators.length === 0)
         return Promise.reject(`error in validators`);

@@ -65,7 +65,7 @@ export class ValidatorParser {
           );
 
           
-          if (block % 5 === 0) {
+          if (block % parseInt(config.get("PARSER.UPDATE_VALIDATOR_PIC_DELAY")) === 0) {
             if (validator.details.description.identity) {
               winston.info("Processing profile url validators");
               

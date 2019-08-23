@@ -60,6 +60,7 @@ export class ValidatorParser {
             validatorRawData
           );
 
+          // Update profile pic each........
           if (block % 10 === 0) {
             if (validator.details.description.identity) {
               winston.info("Processing profile url validators");
@@ -68,10 +69,8 @@ export class ValidatorParser {
                 validator.details.description.identity
               );
               validator.details.description.profile_url = profileurl;
-              console.log(validator);
             }
-          } else {
-            delete validator.details.description.profile_url;
+            console.log(validator);
           }
 
           bulkValidators
@@ -86,7 +85,7 @@ export class ValidatorParser {
         return bulkValidators.execute().then((bulkResult: any) => {
           winston.info("Processed block validators");
 
-          return Promise.resolve(block);
+          //return Promise.resolve(block);
         });
       }
     } catch (err) {
@@ -111,8 +110,7 @@ export class ValidatorParser {
           moniker: validatorData.description.moniker,
           identity: validatorData.description.identity,
           website: validatorData.description.website,
-          details: validatorData.description.details,
-          profile_url: ""
+          details: validatorData.description.details
         },
         commission: {
           rate: validatorData.commission.commission_rates.rate,

@@ -8,47 +8,85 @@ const Schema = mongoose.Schema;
  * @type {"mongoose".Schema}
  */
 const validatorSchema = new Schema({
-    address: {
+  address: {
+    type: String,
+    required: true,
+    index: true
+  },
+  voting_power: {
+    type: Number,
+    required: true
+  },
+  uptime: {
+    type: Schema.Types.ObjectId,
+    ref: "Uptime"
+  },
+  details: {
+    operatorAddress: {
+      type: String,
+      required: true
+    },
+    consensusPubkey: {
+      type: String,
+      required: true
+    },
+    jailed: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
+    status: {
+      type: String,
+      required: true
+    },
+    tokens: {
+      type: String,
+      required: true
+    },
+    delegatorShares: {
+      type: String
+    },
+    description: {
+      moniker: {
         type: String,
-        required: true,
-        index: true
-    },
-    pub_key: {
-        type: Object,
-        required: true,
-    },
-    voting_power: {
-        type: Number,
-    },
-    proposer_priority: {
-        type: Number,
-    },
-    consensus_pubkey: {
-        type: String,
-        required: true,
-        index: true
-    },
-    profile_url: {
+        required: true
+      },
+      identity: {
         type: String
-    }
-}, {
-    _id: false,
-    id: false,
-    versionKey: false,
-    toObject: {
-        virtuals: true
+      },
+      website: {
+        type: String
+      },
+      profile_url: {
+        type: String
+      },
+      details: {
+        type: String
+      }
     },
-    toJSON: {
-        virtuals: true
+    commission: {
+      rate: {
+        type: String
+      },
+      maxRate: {
+        type: String
+      },
+      maxChangeRate: {
+        type: String
+      },
+      updateTime: {
+        type: String
+      }
     }
+  }
 });
 
 validatorSchema.virtual("success").get(function() {
-    if (this.hasOwnProperty("error")) {
-        return this.error === "";
-    }
+  if (this.hasOwnProperty("error")) {
+    return this.error === "";
+  }
 });
 
 validatorSchema.plugin(mongoosePaginate);
 
-export const Validator = mongoose.model("Validator", validatorSchema );
+export const Validator = mongoose.model("Validator", validatorSchema);

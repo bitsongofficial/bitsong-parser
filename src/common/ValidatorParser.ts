@@ -6,7 +6,6 @@ import { IValidator } from "./CommonInterfaces";
 import { Bitsong } from "../services/Bitsong";
 import { getAddress } from "tendermint/lib/pubkey";
 import * as BluebirdPromise from "bluebird";
-import _ from "lodash";
 
 const config = require("config");
 

@@ -19,35 +19,17 @@ export class Bitsong {
   }
 
   static async getValidatorSet(): Promise<any> {
-    let validatorSet = [];
-
-    const validators = await axios
-      .get(`${config.get("LCD")}/staking/validators`)
-      .then(res => JSON.parse(JSON.stringify(res.data.result)));
-
-    const validatorsUnbonded = await axios
-      .get(`${config.get("LCD")}/staking/validators?status=unbonded`)
-      .then(res => JSON.parse(JSON.stringify(res.data.result)));
-
-    const validatorsUnbonding = await axios
-      .get(`${config.get("LCD")}/staking/validators?status=unbonding`)
-      .then(res => JSON.parse(JSON.stringify(res.data.result)));
-
-    for (var i in validators) {
-      validatorSet[validators[i].consensus_pubkey] = validators[i];
-    }
-
-    for (var i in validatorsUnbonded) {
-      validatorSet[validatorsUnbonded[i].consensus_pubkey] =
-        validatorsUnbonded[i];
-    }
-
-    for (var i in validatorsUnbonding) {
-      validatorSet[validatorsUnbonding[i].consensus_pubkey] =
-        validatorsUnbonded[i];
-    }
-
-    return validatorSet;
+    return Promise.all([
+      axios.get(`${config.get("LCD")}/staking/validators`),
+      axios.get(`${config.get("LCD")}/staking/validators?status=unbonded`),
+      axios.get(`${config.get("LCD")}/staking/validators?status=unbonding`)
+    ]).then(validatorGroups =>
+      [].concat(
+        ...validatorGroups[0].data.result,
+        ...validatorGroups[1].data.result,
+        ...validatorGroups[2].data.result
+      )
+    );
   }
 
   static getBlock(blockId: Number): Promise<any> {

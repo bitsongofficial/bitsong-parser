@@ -17,17 +17,17 @@ export interface IBlock {
 
 export interface IValidatorCommission {
   rate: string;
-  maxRate?: string;
-  maxChangeRate?: string;
-  updateTime?: string;
+  maxRate: string;
+  maxChangeRate: string;
+  updateTime: string;
 }
 
 export interface IValidatorDescription {
   moniker: string;
-  identity?: string;
-  website?: string;
+  identity: string;
+  website: string;
   profile_url?: string;
-  details?: string;
+  details: string;
 }
 
 export interface IValidatorDetails {
@@ -36,7 +36,7 @@ export interface IValidatorDetails {
   jailed: boolean;
   status: string;
   tokens: string;
-  delegatorShares?: string;
+  delegatorShares: string;
   description: IValidatorDescription;
   commission: IValidatorCommission;
 }
@@ -50,6 +50,6 @@ export interface IValidatorUptime {
 export interface IValidator {
   address: string;
   voting_power: number;
-  uptime: IValidatorUptime;
+  uptime?: IValidatorUptime;
   details: IValidatorDetails;
 }

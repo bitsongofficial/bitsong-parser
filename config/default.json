@@ -10,6 +10,8 @@
         "DELAYS": {
             "FORWARD": ""
         },
-        "MAX_CONCURRENT_BLOCKS": "20"
+        "MAX_CONCURRENT_BLOCKS": "1",
+        "UPDATE_VALIDATOR_PIC_DELAY": "5"
+
     }
 }

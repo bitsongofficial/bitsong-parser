@@ -8,9 +8,6 @@ const accountSchema = new Schema(
       type: String,
       required: true,
       index: true
-    },
-    balances: {
-      type: Object
     }
   },
   {

@@ -9,7 +9,6 @@ export interface ITransaction {
 export interface IAccount {
   _id: any;
   address: string;
-  balances: any;
 }
 
 export interface IBlock {

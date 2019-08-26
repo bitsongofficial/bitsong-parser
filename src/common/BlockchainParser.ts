@@ -37,9 +37,15 @@ export class BlockchainParser {
 
   public startForwardParsing() {
     return BlockchainState.getBlockState()
-      .then(([blockInChain, blockInDb]) => {
+      .then(async ([blockInChain, blockInDb]) => {
         const startBlock = blockInDb.lastParsedBlock;
         const nextBlock: number = startBlock + 1;
+
+        if (startBlock === 0) {
+          await this.accountParser.parseGenesisAccounts();
+          // this.parseGenesis()
+          console.log("parse genesis");
+        }
 
         if (nextBlock <= blockInChain) {
           winston.info(

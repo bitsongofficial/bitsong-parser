@@ -3,6 +3,12 @@ import axios from "axios";
 const config = require("config");
 
 export class Bitsong {
+  static async getGenesis(): Promise<any> {
+    return await axios.get(`${config.get("RPC")}/genesis`).then(response => {
+      return response.data.result.genesis;
+    });
+  }
+
   static getLastBlock(): Promise<any> {
     return axios.get(config.get("RPC") + "/status").then(response => {
       return response.data.result.sync_info.latest_block_height;

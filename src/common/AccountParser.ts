@@ -20,6 +20,25 @@ export class AccountParser {
     return this.bech32ify(address, prefix);
   };
 
+  public async parseGenesisAccounts() {
+    try {
+      const genesis = await Bitsong.getGenesis();
+      const accounts = genesis.app_state.accounts;
+
+      for (const account of accounts) {
+        await Account.findOneAndUpdate(
+          { address: account.address },
+          { $set: { address: account.address } },
+          { upsert: true, new: true }
+        ).exec();
+      }
+
+      winston.info("Processed " + accounts.length + " accounts from genesis.");
+    } catch (error) {
+      winston.error(`Could not parse genesis accounts with error: ${error}`);
+    }
+  }
+
   public async parseSigners(transactions: any) {
     if (typeof transactions === "undefined") return Promise.resolve();
     if (transactions.length === 0) return Promise.resolve();
@@ -36,17 +55,12 @@ export class AccountParser {
         // Balance Commission (only validators): http://lcd.testnet-2.bitsong.network/distribution/validators/bitsongvaloper18p62z98hrn6h9qyqem7kxy04l8u7a4yv9tc3re/rewards
 
         const address = this.pubkeyUserToBech32(signature.pub_key.value);
-
-        const balances = await Bitsong.getBalances(address);
-
-        const accountData = {
-          address: address,
-          balances: balances
-        };
+        //const balances = await Bitsong.getBalances(address);
 
         return await Account.findOneAndUpdate(
           { address: address },
-          { $set: { address: address, balances: balances } },
+          //{ $set: { address: address, balances: balances } },
+          { $set: { address: address } },
           {
             upsert: true,
             new: true

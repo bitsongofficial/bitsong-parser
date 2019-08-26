@@ -1,8 +1,14 @@
 export interface ITransaction {
   hash: string;
   msgs: any[];
+  signatures: any[];
   height: number;
   time: string;
+}
+
+export interface IAccount {
+  _id: any;
+  address: string;
 }
 
 export interface IBlock {

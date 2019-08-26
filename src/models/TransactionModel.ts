@@ -28,7 +28,7 @@ const transactionSchema = new Schema(
     signatures: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Accounts"
+        ref: "Account"
       }
     ],
     status: {

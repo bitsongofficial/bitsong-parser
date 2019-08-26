@@ -11,7 +11,6 @@ const accountSchema = new Schema(
     }
   },
   {
-    _id: false,
     id: false,
     versionKey: false,
     toObject: {

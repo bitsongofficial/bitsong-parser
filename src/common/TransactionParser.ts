@@ -73,6 +73,7 @@ export class TransactionParser {
       height: Number(transaction.height),
       status: Boolean(transaction.logs[0].success),
       msgs: transaction.tx.value.msg,
+      signatures: transaction.tx.value.signatures,
       gas_wanted: Number(transaction.gas_wanted),
       gas_used: Number(transaction.gas_used),
       fee_amount: transaction.tx.value.fee.amount,

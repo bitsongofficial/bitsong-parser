@@ -7,88 +7,95 @@ const Schema = mongoose.Schema;
  *
  * @type {"mongoose".Schema}
  */
-const validatorSchema = new Schema({
-  address: {
-    type: String,
-    required: true,
-    index: true
-  },
-  voting_power: {
-    type: Number,
-    required: true
-  },
-  proposer_priority: {
-    type: Number,
-    required: true
-  },
-  uptime: {
-    type: Schema.Types.ObjectId,
-    ref: "Uptime"
-  },
-  details: {
-    operatorAddress: {
+const validatorSchema = new Schema(
+  {
+    address: {
       type: String,
-      required: true
-    },
-    consensusPubkey: {
-      type: String,
-      required: true
-    },
-    jailed: {
-      type: Boolean,
       required: true,
-      default: false
+      index: true
     },
-    status: {
-      type: String,
+    voting_power: {
+      type: Number,
       required: true
     },
-    tokens: {
-      type: String,
+    proposer_priority: {
+      type: Number,
       required: true
     },
-    delegatorShares: {
-      type: String
+    uptime: {
+      type: Schema.Types.ObjectId,
+      ref: "Uptime"
     },
-    description: {
-      moniker: {
+    details: {
+      operatorAddress: {
         type: String,
         required: true
       },
-      identity: {
+      delegatorAddress: {
+        type: String,
+        required: true
+      },
+      consensusPubkey: {
+        type: String,
+        required: true
+      },
+      jailed: {
+        type: Boolean,
+        required: true,
+        default: false
+      },
+      status: {
+        type: String,
+        required: true
+      },
+      tokens: {
+        type: String,
+        required: true
+      },
+      delegatorShares: {
         type: String
       },
-      website: {
-        type: String
+      description: {
+        moniker: {
+          type: String,
+          required: true
+        },
+        identity: {
+          type: String
+        },
+        website: {
+          type: String
+        },
+        profile_url: {
+          type: String
+        },
+        details: {
+          type: String
+        }
       },
-      profile_url: {
-        type: String
-      },
-      details: {
-        type: String
-      }
-    },
-    commission: {
-      rate: {
-        type: String
-      },
-      maxRate: {
-        type: String
-      },
-      maxChangeRate: {
-        type: String
-      },
-      updateTime: {
-        type: String
+      commission: {
+        rate: {
+          type: String
+        },
+        maxRate: {
+          type: String
+        },
+        maxChangeRate: {
+          type: String
+        },
+        updateTime: {
+          type: String
+        }
       }
     }
+  },
+  {
+    versionKey: false
   }
-}, {
-  versionKey: false,
-});
+);
 
 // indices
-validatorSchema.index({address: 1}, {name: "validatorAddressIndex"});
+validatorSchema.index({ address: 1 }, { name: "validatorAddressIndex" });
 
 validatorSchema.plugin(mongoosePaginate);
 

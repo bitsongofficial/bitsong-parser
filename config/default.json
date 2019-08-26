@@ -13,7 +13,8 @@
             "FORWARD": ""
         },
         "MAX_CONCURRENT_BLOCKS": "20",
-        "UPDATE_VALIDATOR_PIC_DELAY": "300"
+        "UPDATE_VALIDATOR_PIC_DELAY": "17280",
+        "FORCE_BALANCE_UPDATES_EACH_BLOCKS": "17280" // ~24h
 
     }
 }

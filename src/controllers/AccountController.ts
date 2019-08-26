@@ -25,7 +25,8 @@ export class AccountController {
 
     Account.paginate(query, {
       page: queryParams.page,
-      limit: queryParams.limit
+      limit: queryParams.limit,
+      sort: { "balances.total": -1 }
     })
       .then((accounts: any) => {
         sendJSONresponse(res, 200, accounts);

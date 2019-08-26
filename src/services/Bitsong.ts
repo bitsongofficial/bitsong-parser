@@ -11,7 +11,7 @@ export class Bitsong {
 
   static getLastBlock(): Promise<any> {
     return axios.get(config.get("RPC") + "/status").then(response => {
-      return response.data.result.sync_info.latest_block_height;
+      return parseInt(response.data.result.sync_info.latest_block_height);
     });
   }
 
@@ -71,9 +71,12 @@ export class Bitsong {
       unbongings.forEach(unbondig_balance => {
         unbondig_balance += parseFloat(unbondig_balance.balance.amount);
       });
-      const rewards_balance = parseFloat(
-        balances[3].data.result.total[0].amount
-      );
+      let rewards_balance = 0;
+      if (balances[3].data.result.total !== null) {
+        if (balances[3].data.result.total.length > 0) {
+          rewards_balance = parseFloat(balances[3].data.result.total[0].amount);
+        }
+      }
       const total_balance =
         available_balance +
         delegations_balance +
@@ -84,6 +87,7 @@ export class Bitsong {
         delegations: delegations_balance,
         unbonding: unbondig_balance,
         rewards: rewards_balance,
+        commissions: 0,
         total: total_balance
       };
       // [].concat(

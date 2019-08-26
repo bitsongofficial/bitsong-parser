@@ -43,8 +43,7 @@ export class BlockchainParser {
 
         if (startBlock === 0) {
           await this.accountParser.parseGenesisAccounts();
-          // this.parseGenesis()
-          console.log("parse genesis");
+          winston.info("Genesis parsed successfully!");
         }
 
         if (nextBlock <= blockInChain) {

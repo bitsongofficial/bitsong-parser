@@ -23,12 +23,42 @@ export class AccountParser {
   public async parseGenesisAccounts() {
     try {
       const genesis = await Bitsong.getGenesis();
-      const accounts = genesis.app_state.accounts;
+      const accounts = genesis.app_state.accounts.map((account: any) => {
+        return {
+          address: account.address,
+          coins: account.coins
+        };
+      });
+      const gentxs = genesis.app_state.genutil.gentxs.map((gentx: any) => {
+        if (gentx.value.msg[0].type === "cosmos-sdk/MsgCreateValidator") {
+          return {
+            address: gentx.value.msg[0].value.delegator_address,
+            coins: gentx.value.msg[0].value.value
+          };
+        }
+      });
 
-      for (const account of accounts) {
+      for (let account of accounts) {
+        const balances = {
+          available: parseFloat(account.coins[0].amount),
+          delegations: 0,
+          unbonding: 0,
+          rewards: 0,
+          commissions: 0,
+          total: parseFloat(account.coins[0].amount),
+          height: 0
+        };
+
+        const gentx = gentxs.filter(v => v.address === account.address);
+
+        if (gentx.length > 0) {
+          balances.available -= parseFloat(gentx[0].coins.amount);
+          balances.delegations += parseFloat(gentx[0].coins.amount);
+        }
+
         await Account.findOneAndUpdate(
           { address: account.address },
-          { $set: { address: account.address } },
+          { $set: { address: account.address, balances: balances } },
           { upsert: true, new: true }
         ).exec();
       }
@@ -46,7 +76,6 @@ export class AccountParser {
     for (const transaction of transactions) {
       const signatures = transaction.signatures;
       if (signatures.length === 0) return Promise.resolve();
-
       for (const signature of signatures) {
         // Balance Available: http://lcd.testnet-2.bitsong.network/bank/balances/bitsong1hpl6843jmrw29mp485wz5m27mqm6lnh8utw3le
         // Balance Delegations: http://lcd.testnet-2.bitsong.network/staking/delegators/bitsong1hpl6843jmrw29mp485wz5m27mqm6lnh8utw3le/delegations
@@ -55,12 +84,12 @@ export class AccountParser {
         // Balance Commission (only validators): http://lcd.testnet-2.bitsong.network/distribution/validators/bitsongvaloper18p62z98hrn6h9qyqem7kxy04l8u7a4yv9tc3re/rewards
 
         const address = this.pubkeyUserToBech32(signature.pub_key.value);
-        //const balances = await Bitsong.getBalances(address);
+        let balances = await Bitsong.getBalances(address);
+        balances.height = parseInt(transaction.height);
 
         return await Account.findOneAndUpdate(
           { address: address },
-          //{ $set: { address: address, balances: balances } },
-          { $set: { address: address } },
+          { $set: { address: address, balances: balances } },
           {
             upsert: true,
             new: true

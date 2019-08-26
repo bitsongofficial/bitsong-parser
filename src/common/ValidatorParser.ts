@@ -2,6 +2,7 @@ import * as winston from "winston";
 import * as bech32 from "bech32";
 import axios from "axios";
 import { Validator } from "../models/ValidatorModel";
+import { Account } from "../models/AccountModel";
 import { IValidator } from "./CommonInterfaces";
 import { Bitsong } from "../services/Bitsong";
 import { getAddress } from "tendermint/lib/pubkey";
@@ -65,12 +66,40 @@ export class ValidatorParser {
     return null;
   }
 
-  async parseBlock(block: number): Promise<any> {
+  async parseBlock(block: any): Promise<any> {
     if (block < 1) return Promise.resolve();
 
     try {
       const bulkValidators = Validator.collection.initializeUnorderedBulkOp();
+      const bulkAccounts = Account.collection.initializeUnorderedBulkOp();
       const validatorList = await Bitsong.getValidators(block);
+
+      if (
+        block %
+          parseInt(config.get("PARSER.FORCE_BALANCE_UPDATES_EACH_BLOCKS")) ===
+        0
+      ) {
+        const lte_height =
+          block -
+          parseInt(config.get("PARSER.FORCE_BALANCE_UPDATES_EACH_BLOCKS"));
+        const accounts = await Account.find({
+          "balances.height": { $lte: lte_height }
+        });
+
+        for (const account of accounts) {
+          let balances = await Bitsong.getBalances(account.address);
+          balances.height = parseInt(block);
+
+          bulkAccounts
+            .find({ address: account.address })
+            .updateOne({ $set: { balances: balances } });
+        }
+
+        if (bulkAccounts.length > 0) {
+          await bulkAccounts.execute();
+          winston.info(`Updated ${bulkAccounts.length} balances.`);
+        }
+      }
 
       for (var i in validatorList.validators) {
         validatorList.validators[i].pub_key.bech32 = this.pubkeyToBech32(

@@ -44,7 +44,7 @@ export class AccountParser {
           balances: balances
         };
 
-        await Account.findOneAndUpdate(
+        return await Account.findOneAndUpdate(
           { address: address },
           { $set: { address: address, balances: balances } },
           {

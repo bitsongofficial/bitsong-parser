@@ -84,12 +84,12 @@ export class AccountParser {
         // Balance Commission (only validators): http://lcd.testnet-2.bitsong.network/distribution/validators/bitsongvaloper18p62z98hrn6h9qyqem7kxy04l8u7a4yv9tc3re/rewards
 
         const address = this.pubkeyUserToBech32(signature.pub_key.value);
-        let balances = await Bitsong.getBalances(address);
-        balances.height = parseInt(transaction.height);
+        // let balances = await Bitsong.getBalances(address);
+        // balances.height = parseInt(transaction.height);
 
         return await Account.findOneAndUpdate(
           { address: address },
-          { $set: { address: address, balances: balances } },
+          { $set: { address: address } },
           {
             upsert: true,
             new: true

@@ -55,6 +55,9 @@ const validatorSchema = new Schema(
       delegatorShares: {
         type: String
       },
+      selfDelegated: {
+        type: Number
+      },
       description: {
         moniker: {
           type: String,

@@ -1,6 +1,7 @@
 import * as winston from "winston";
 import { Message } from "../models/MessageModel";
 import { Transaction } from "../models/TransactionModel";
+import { Validator } from "../models/ValidatorModel";
 import { ITransaction } from "./CommonInterfaces";
 
 export class MessageParser {
@@ -17,7 +18,29 @@ export class MessageParser {
           upsert: true,
           new: true
         })
-          .then((message: any) => {
+          .then(async (message: any) => {
+            if (message.type === "cosmos-sdk/MsgDelegate") {
+              try {
+                const validator = await Validator.findOneAndUpdate(
+                  {
+                    "details.delegatorAddress": message.value.delegator_address
+                  },
+                  {
+                    $inc: {
+                      "details.selfDelegated": parseFloat(
+                        message.value.amount.amount
+                      )
+                    }
+                  }
+                ).exec();
+                console.log(validator);
+              } catch (error) {
+                winston.error(
+                  `Could not update message to validator shares with error: ${error}`
+                );
+              }
+            }
+
             return Transaction.findOneAndUpdate(
               { hash: transaction.hash },
               { $push: { msgs: message._id } }

@@ -40,7 +40,7 @@ export interface IValidatorDescription {
 export interface IValidatorDetails {
   operatorAddress: string;
   delegatorAddress: string;
-  consensusPubKey: string;
+  consensusPubkey: string;
   jailed: boolean;
   status: string;
   tokens: string;

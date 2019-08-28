@@ -33,6 +33,27 @@ export class MessageParser {
                     }
                   }
                 ).exec();
+              } catch (error) {
+                winston.error(
+                  `Could not update message to validator shares with error: ${error}`
+                );
+              }
+            }
+
+            if (message.type === "cosmos-sdk/MsgUndelegate") {
+              try {
+                const validator = await Validator.findOneAndUpdate(
+                  {
+                    "details.delegatorAddress": message.value.delegator_address
+                  },
+                  {
+                    $inc: {
+                      "details.selfDelegated": -parseFloat(
+                        message.value.amount.amount
+                      )
+                    }
+                  }
+                ).exec();
                 console.log(validator);
               } catch (error) {
                 winston.error(

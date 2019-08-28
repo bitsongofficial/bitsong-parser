@@ -3,6 +3,7 @@ import * as bech32 from "bech32";
 import * as CryptoJS from "crypto-js";
 import { Account } from "../models/AccountModel";
 import { Transaction } from "../models/TransactionModel";
+import { Validator } from "../models/ValidatorModel";
 import { ITransaction, IAccount } from "./CommonInterfaces";
 import { Bitsong } from "../services/Bitsong";
 
@@ -33,6 +34,7 @@ export class AccountParser {
         if (gentx.value.msg[0].type === "cosmos-sdk/MsgCreateValidator") {
           return {
             address: gentx.value.msg[0].value.delegator_address,
+            consensusPubkey: gentx.value.msg[0].value.pubkey,
             coins: gentx.value.msg[0].value.value
           };
         }
@@ -54,6 +56,18 @@ export class AccountParser {
         if (gentx.length > 0) {
           balances.available -= parseFloat(gentx[0].coins.amount);
           balances.delegations += parseFloat(gentx[0].coins.amount);
+
+          await Validator.findOneAndUpdate(
+            {
+              "details.consensusPubkey": gentx[0].consensusPubkey
+            },
+            {
+              $inc: {
+                "details.selfDelegated": parseFloat(gentx[0].coins.amount)
+              }
+            },
+            { upsert: true }
+          ).exec();
         }
 
         await Account.findOneAndUpdate(

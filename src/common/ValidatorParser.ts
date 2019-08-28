@@ -132,7 +132,7 @@ export class ValidatorParser {
 
             bulkValidators
               .find({
-                "details.consensusPubKey": validator.details.consensusPubKey
+                "details.consensusPubkey": validator.details.consensusPubkey
               })
               .updateOne({
                 $set: { "details.description.profile_url": profileurl }
@@ -142,7 +142,7 @@ export class ValidatorParser {
 
         bulkValidators
           .find({
-            "details.consensusPubKey": validator.details.consensusPubKey
+            "details.consensusPubkey": validator.details.consensusPubkey
           })
           .upsert()
           .updateOne({
@@ -152,7 +152,7 @@ export class ValidatorParser {
               proposer_priority: validator.proposer_priority,
               "details.operatorAddress": validator.details.operatorAddress,
               "details.delegatorAddress": validator.details.delegatorAddress,
-              "details.consensusPubKey": validator.details.consensusPubKey,
+              "details.consensusPubkey": validator.details.consensusPubkey,
               "details.jailed": validator.details.jailed,
               "details.status": validator.details.status,
               "details.tokens": validator.details.tokens,
@@ -204,7 +204,7 @@ export class ValidatorParser {
         delegatorAddress: this.getDelegatorAddress(
           validatorData.operator_address
         ),
-        consensusPubKey: validatorData.consensus_pubkey,
+        consensusPubkey: validatorData.consensus_pubkey,
         jailed: validatorData.jailed,
         status: validatorData.status,
         tokens: validatorData.tokens,

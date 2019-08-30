@@ -7,46 +7,49 @@ const Schema = mongoose.Schema;
  *
  * @type {"mongoose".Schema}
  */
-const blockSchema = new Schema({
+const blockSchema = new Schema(
+  {
     height: {
-        type: Number,
-        required: true,
-        index: true
+      type: Number,
+      required: true,
+      index: true
     },
     hash: {
-        type: String,
-        required: true,
-        index: true
+      type: String,
+      required: true,
+      index: true
     },
     time: {
-        type: Date,
-        required: true
+      type: String,
+      required: true
     },
     num_txs: {
-        type: Number,
+      type: Number
     },
     proposer: {
-        type: String,
-        required: true,
+      type: String,
+      required: true
     }
-}, {
+  },
+  {
     _id: false,
     id: false,
     versionKey: false,
     toObject: {
-        virtuals: true
+      virtuals: true
     },
     toJSON: {
-        virtuals: true
+      virtuals: true
     }
-});
+  }
+);
 
 blockSchema.virtual("success").get(function() {
-    if (this.hasOwnProperty("error")) {
-        return this.error === "";
-    }
+  if (this.hasOwnProperty("error")) {
+    return this.error === "";
+  }
 });
 
 blockSchema.plugin(mongoosePaginate);
 
-export const Block = mongoose.model("Block", blockSchema );
+export const Block = mongoose.model("Block", blockSchema);

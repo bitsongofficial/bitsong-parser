@@ -20,7 +20,7 @@ const blockSchema = new Schema(
       index: true
     },
     time: {
-      type: String,
+      type: Date,
       required: true
     },
     num_txs: {

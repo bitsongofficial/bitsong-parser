@@ -15,7 +15,7 @@ export interface IAccount {
 export interface IBlock {
   height: number;
   hash: string;
-  time: string;
+  time: Date;
   num_txs: number;
   proposer: string;
 }

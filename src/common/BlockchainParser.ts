@@ -148,43 +148,47 @@ export class BlockchainParser {
       return Bitsong.getBlock(number);
     });
 
-    return Promise.all(promises)
-      .then((blocks: any) => {
-        const hasNullBlocks = blocks.filter((block: any) => block === null);
+    return (
+      Promise.all(promises)
+        .then((blocks: any) => {
+          const hasNullBlocks = blocks.filter((block: any) => block === null);
 
-        if (hasNullBlocks.length > 0) {
-          return Promise.reject(
-            "Has null blocks. Wait for RPC to build a block"
+          if (hasNullBlocks.length > 0) {
+            return Promise.reject(
+              "Has null blocks. Wait for RPC to build a block"
+            );
+          }
+
+          this.blockParser.parseBlocks(blocks);
+
+          return blocks;
+        })
+        // .then((blocks: any) => {
+        //   return this.validatorParser.parseValidators(blocks);
+        // })
+        .then((blocks: any) => {
+          return this.transactionParser.parseTransactions(
+            this.flatBlocksWithMissingTransactions(blocks)
           );
-        }
-
-        this.blockParser.parseBlocks(blocks);
-
-        return blocks;
-      })
-      .then((blocks: any) => {
-        return this.validatorParser.parseValidators(blocks);
-      })
-      .then((blocks: any) => {
-        return this.transactionParser.parseTransactions(
-          this.flatBlocksWithMissingTransactions(blocks)
-        );
-      })
-      .then((transactions: any) => {
-        return this.messageParser.parseMessages(transactions);
-      })
-      .then((transactions: any) => {
-        return this.accountParser.parseSigners(transactions);
-      })
-      .then((transactions: any) => {
-        //return this.coinParser.parseCoins(transactions);
-      })
-      .then(() => {
-        const endBlock = ascending
-          ? numberBlocks[numberBlocks.length - 1]
-          : numberBlocks[0];
-        return endBlock ? Promise.resolve(endBlock) : Promise.reject(endBlock);
-      });
+        })
+        .then((transactions: any) => {
+          return this.messageParser.parseMessages(transactions);
+        })
+        .then((transactions: any) => {
+          return this.accountParser.parseSigners(transactions);
+        })
+        .then((transactions: any) => {
+          //return this.coinParser.parseCoins(transactions);
+        })
+        .then(() => {
+          const endBlock = ascending
+            ? numberBlocks[numberBlocks.length - 1]
+            : numberBlocks[0];
+          return endBlock
+            ? Promise.resolve(endBlock)
+            : Promise.reject(endBlock);
+        })
+    );
   }
 
   private saveLastParsedBlock(block: number, lastBlock: number) {

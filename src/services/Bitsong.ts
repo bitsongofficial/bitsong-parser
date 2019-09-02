@@ -1,8 +1,23 @@
 import axios from "axios";
+import * as bech32 from "bech32";
+import * as CryptoJS from "crypto-js";
 
 const config = require("config");
 
 export class Bitsong {
+  static bech32ify(address, prefix = "bitsong") {
+    const words = bech32.toWords(Buffer.from(address, "hex"));
+    return bech32.encode(prefix, words);
+  }
+
+  static pubkeyUserToBech32 = (pubkey, prefix = "bitsong") => {
+    const message = CryptoJS.enc.Hex.parse(
+      Buffer.from(pubkey, "base64").toString("hex")
+    );
+    const address = CryptoJS.RIPEMD160(CryptoJS.SHA256(message)).toString();
+    return Bitsong.bech32ify(address, prefix);
+  };
+
   static async getGenesis(): Promise<any> {
     return await axios.get(`${config.get("RPC")}/genesis`).then(response => {
       return response.data.result.genesis;

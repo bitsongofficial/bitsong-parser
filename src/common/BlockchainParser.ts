@@ -172,14 +172,14 @@ export class BlockchainParser {
           );
         })
         .then((transactions: any) => {
-          return this.messageParser.parseMessages(transactions);
-        })
-        .then((transactions: any) => {
           return this.accountParser.parseSigners(transactions);
         })
-        .then((transactions: any) => {
-          //return this.coinParser.parseCoins(transactions);
-        })
+        // .then((transactions: any) => {
+        //   return this.messageParser.parseMessages(transactions);
+        // })
+        // .then((transactions: any) => {
+        //   //return this.coinParser.parseCoins(transactions);
+        // })
         .then(() => {
           const endBlock = ascending
             ? numberBlocks[numberBlocks.length - 1]

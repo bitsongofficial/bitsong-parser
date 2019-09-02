@@ -15,20 +15,18 @@ const transactionSchema = new Schema(
       index: true
     },
     height: {
-      type: String,
+      type: Number,
       required: true,
       index: true
     },
     msgs: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Message"
+        type: Object
       }
     ],
     signatures: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Account"
+        type: String
       }
     ],
     status: {
@@ -37,13 +35,11 @@ const transactionSchema = new Schema(
     },
     gas_wanted: {
       type: Number,
-      required: true,
-      index: true
+      required: true
     },
     gas_used: {
       type: Number,
-      required: true,
-      index: true
+      required: true
     },
     fee_amount: [],
     time: {

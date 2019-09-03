@@ -41,10 +41,10 @@ export class BlockchainParser {
         const startBlock = blockInDb.lastParsedBlock;
         const nextBlock: number = startBlock + 1;
 
-        if (startBlock === 0) {
-          await this.accountParser.parseGenesisAccounts();
-          winston.info("Genesis parsed successfully!");
-        }
+        // if (startBlock === 0) {
+        //   await this.accountParser.parseGenesisAccounts();
+        //   winston.info("Genesis parsed successfully!");
+        // }
 
         if (nextBlock <= blockInChain) {
           winston.info(
@@ -163,17 +163,14 @@ export class BlockchainParser {
 
           return blocks;
         })
-        // .then((blocks: any) => {
-        //   return this.validatorParser.parseValidators(blocks);
-        // })
         .then((blocks: any) => {
           return this.transactionParser.parseTransactions(
             this.flatBlocksWithMissingTransactions(blocks)
           );
         })
-        .then((transactions: any) => {
-          return this.accountParser.parseSigners(transactions);
-        })
+        // .then((transactions: any) => {
+        //   return this.accountParser.parseSigners(transactions);
+        // })
         // .then((transactions: any) => {
         //   return this.messageParser.parseMessages(transactions);
         // })

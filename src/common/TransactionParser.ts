@@ -1,5 +1,7 @@
 import * as winston from "winston";
 import { Transaction } from "../models/TransactionModel";
+import { Message } from "../models/MessageModel";
+import { Account } from "../models/AccountModel";
 import { ITransaction } from "./CommonInterfaces";
 import { Bitsong } from "../services/Bitsong";
 import { sha256 } from "js-sha256";
@@ -14,22 +16,6 @@ export class TransactionParser {
   }
 
   async extractTransactions(hashes: any): Promise<any> {
-    // const transactions = [];
-    // const rawTransactions = [];
-
-    // await Promise.all(
-    //   hashes.map(async (hash: any) => {
-    //     await Bitsong.getTxByHash(hash).then((transaction: any) => {
-    //       const data = this.extractTransactionData(transaction);
-
-    //       rawTransactions.push(data);
-    //       transactions.push(new Transaction(data));
-    //     });
-    //   })
-    // );
-
-    // return [transactions, rawTransactions];
-
     return Promise.all(
       hashes.map(async (hash: any) => {
         return await Bitsong.getTxByHash(hash).then((transaction: any) => {
@@ -37,6 +23,26 @@ export class TransactionParser {
         });
       })
     );
+  }
+
+  public async parseMessages(transaction: any) {
+    const msgs = [];
+    debugger;
+
+    for (const msg of transaction.msgs) {
+      const doc = await Message.findOneAndUpdate(
+        { tx_hash: transaction.hash },
+        msg,
+        {
+          upsert: true,
+          new: true
+        }
+      );
+
+      msgs.push(doc._id);
+    }
+
+    return msgs;
   }
 
   public async parseTransactions(blocks: any) {
@@ -47,19 +53,29 @@ export class TransactionParser {
     const extractedTransactions = await this.extractTransactions(
       extractedHashes
     );
-    // debugger;
 
-    // const [
-    //   extractedTransactions,
-    //   extractedTransactionsRaw
-    // ] = await this.extractTransactions(extractedHashes);
+    for (let transaction of extractedTransactions) {
+      const signatures = transaction.signatures;
+      transaction.signatures = [];
 
-    debugger;
+      for (const signature of signatures) {
+        const account = await Account.findOneAndUpdate(
+          { address: signature },
+          { $set: { address: signature } },
+          {
+            upsert: true,
+            new: true
+          }
+        );
 
-    // Parse signers
-    //await accountParser.parseSigners(extractedTransactions);
+        debugger;
 
-    for (const transaction of extractedTransactions) {
+        transaction.signatures.push(account._id);
+      }
+
+      const msgs = await this.parseMessages(transaction);
+      transaction.msgs = msgs;
+
       debugger;
 
       bulkTransactions

@@ -21,12 +21,14 @@ const transactionSchema = new Schema(
     },
     msgs: [
       {
-        type: Object
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Message"
       }
     ],
     signatures: [
       {
-        type: String
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Account"
       }
     ],
     status: {

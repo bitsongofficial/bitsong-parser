@@ -41,10 +41,10 @@ export class BlockchainParser {
         const startBlock = blockInDb.lastParsedBlock;
         const nextBlock: number = startBlock + 1;
 
-        // if (startBlock === 0) {
-        //   await this.accountParser.parseGenesisAccounts();
-        //   winston.info("Genesis parsed successfully!");
-        // }
+        if (startBlock === 0) {
+          await this.accountParser.parseGenesisAccounts();
+          winston.info("Genesis parsed successfully!");
+        }
 
         if (nextBlock <= blockInChain) {
           winston.info(

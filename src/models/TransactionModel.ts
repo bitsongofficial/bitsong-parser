@@ -19,6 +19,9 @@ const transactionSchema = new Schema(
       required: true,
       index: true
     },
+    memo: {
+      type: String
+    },
     msgs: [
       {
         type: mongoose.Schema.Types.ObjectId,

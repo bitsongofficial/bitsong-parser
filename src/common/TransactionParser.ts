@@ -30,14 +30,8 @@ export class TransactionParser {
     debugger;
 
     for (const msg of transaction.msgs) {
-      const doc = await Message.findOneAndUpdate(
-        { tx_hash: transaction.hash },
-        msg,
-        {
-          upsert: true,
-          new: true
-        }
-      );
+      const doc = new Message({ ...msg, tx_hash: transaction.hash });
+      await doc.save();
 
       msgs.push(doc._id);
     }

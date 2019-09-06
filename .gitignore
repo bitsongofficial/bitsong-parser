@@ -20,6 +20,7 @@ dist
 docker/data/
 
 # Ignore config enviroment
+config/default.json
 config/test.json
 config/development.json
 .env

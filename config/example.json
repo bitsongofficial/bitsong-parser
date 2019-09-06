@@ -1,0 +1,15 @@
+{
+    "MONGO": {
+        "URI": "mongodb://localhost:27017/sentinel?replicaSet=replica01"
+    },
+    "RPC": "http://rpc.sentinel-turing-1.bas.network",
+    "LCD": "http://lcd.sentinel-turing-1.bas.network",
+    "PARSER": {
+        "DELAYS": {
+            "FORWARD": ""
+        },
+        "MAX_CONCURRENT_BLOCKS": "3",
+        "UPDATE_VALIDATOR_PIC_DELAY": "17280",
+        "FORCE_BALANCE_UPDATES_EACH_BLOCKS": "17280" // ~24h
+    }
+}

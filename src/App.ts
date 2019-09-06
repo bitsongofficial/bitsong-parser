@@ -1,4 +1,3 @@
-
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as logger from "morgan";
@@ -11,70 +10,69 @@ import { Database } from "./models/Database";
 
 const config = require("config");
 const cors = require("cors");
-const compression = require("compression")
+const compression = require("compression");
 const port = process.env.PORT || 8000;
 
 export class App {
+  public app: any;
+  public db: Database;
 
-    public app: any;
-    public db: Database;
+  constructor() {
+    // create app
+    this.app = express();
 
+    // configure
+    this.configureMiddleware();
 
-    constructor() {
-        // create app
-        this.app = express();
+    // setup database
+    this.setupDatabase();
 
-        // configure
-        this.configureMiddleware();
+    // add routes
+    this.addRoutes();
 
-        // setup database
-        this.setupDatabase();
+    // eventually start
+    this.launch();
+  }
 
-        // add routes
-        this.addRoutes();
+  private configureMiddleware() {
+    this.app.use(compression());
+    this.app.use(cors());
+    this.app.set("port", port);
+    this.app.use(logger("dev"));
+    this.app.use(bodyParser.json());
+    this.app.use(bodyParser.urlencoded({ extended: true }));
+    this.app.use(expressValidator());
 
-        // eventually start
-        this.launch();
-    }
+    // configure winston logger
+    winston.add(winston.transports.File, {
+      filename: "sdk-parser.log",
+      level: "info",
+      json: true,
+      eol: "\r\n",
+      timestamp: true
+    });
 
+    // remove for production
+    this.app.use(errorHandler());
+  }
 
-    private configureMiddleware() {
-        this.app.use(compression())
-        this.app.use(cors());
-        this.app.set("port", port);
-        this.app.use(logger("dev"));
-        this.app.use(bodyParser.json());
-        this.app.use(bodyParser.urlencoded({ extended: true }));
-        this.app.use(expressValidator());
+  private setupDatabase() {
+    this.db = new Database(config.get("MONGO.URI"));
+    this.db.connect();
+  }
 
-        // configure winston logger
-        winston.add(
-            winston.transports.File, {
-                filename: "bitsong-parser.log",
-                level: "info",
-                json: true,
-                eol: "\r\n",
-                timestamp: true
-            }
-        );
+  private addRoutes() {
+    this.app.use("/", router);
+  }
 
-        // remove for production
-        this.app.use(errorHandler());
-    }
-
-    private setupDatabase() {
-        this.db = new Database(config.get("MONGO.URI"));
-        this.db.connect();
-    }
-
-    private addRoutes() {
-        this.app.use("/", router);
-    }
-
-    private launch() {
-        this.app.listen(this.app.get("port"), () => {
-            winston.info(("App is running at http://localhost:%d in %s mode"), this.app.get("port"), this.app.get("env"));
-            winston.info("Press CTRL-C to stop\n");
-        });
-    }
+  private launch() {
+    this.app.listen(this.app.get("port"), () => {
+      winston.info(
+        "App is running at http://localhost:%d in %s mode",
+        this.app.get("port"),
+        this.app.get("env")
+      );
+      winston.info("Press CTRL-C to stop\n");
+    });
+  }
 }

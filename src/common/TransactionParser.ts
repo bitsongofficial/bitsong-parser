@@ -3,8 +3,10 @@ import { Transaction } from "../models/TransactionModel";
 import { Message } from "../models/MessageModel";
 import { Account } from "../models/AccountModel";
 import { ITransaction } from "./CommonInterfaces";
-import { Bitsong } from "../services/Bitsong";
+import { Sdk } from "../services/Sdk";
 import { sha256 } from "js-sha256";
+
+const config = require("config");
 
 export class TransactionParser {
   public extractHash(blocks: any) {
@@ -18,7 +20,7 @@ export class TransactionParser {
   async extractTransactions(hashes: any): Promise<any> {
     return Promise.all(
       hashes.map(async (hash: any) => {
-        return await Bitsong.getTxByHash(hash).then((transaction: any) => {
+        return await Sdk.getTxByHash(hash).then((transaction: any) => {
           return this.extractTransactionData(transaction);
         });
       })
@@ -91,13 +93,16 @@ export class TransactionParser {
 
   extractTransactionData(transaction: any) {
     const signatures = transaction.tx.value.signatures.map((signature: any) => {
-      return Bitsong.pubkeyUserToBech32(signature.pub_key.value);
+      return Sdk.pubkeyUserToBech32(
+        signature.pub_key.value,
+        config.get("bech32PrefixAccAddr")
+      );
     });
 
     return {
       hash: String(transaction.txhash),
       height: Number(transaction.height),
-      status: Boolean(transaction.logs[0].success),
+      status: transaction.logs ? Boolean(transaction.logs[0].success) : false,
       msgs: transaction.tx.value.msg,
       signatures: signatures,
       gas_wanted: Number(transaction.gas_wanted),

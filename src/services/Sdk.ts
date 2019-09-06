@@ -4,18 +4,18 @@ import * as CryptoJS from "crypto-js";
 
 const config = require("config");
 
-export class Bitsong {
-  static bech32ify(address, prefix = "bitsong") {
+export class Sdk {
+  static bech32ify(address, prefix) {
     const words = bech32.toWords(Buffer.from(address, "hex"));
     return bech32.encode(prefix, words);
   }
 
-  static pubkeyUserToBech32 = (pubkey, prefix = "bitsong") => {
+  static pubkeyUserToBech32 = (pubkey, prefix) => {
     const message = CryptoJS.enc.Hex.parse(
       Buffer.from(pubkey, "base64").toString("hex")
     );
     const address = CryptoJS.RIPEMD160(CryptoJS.SHA256(message)).toString();
-    return Bitsong.bech32ify(address, prefix);
+    return Sdk.bech32ify(address, prefix);
   };
 
   static async getGenesis(): Promise<any> {
@@ -53,11 +53,6 @@ export class Bitsong {
   }
 
   static async getBalances(address: String): Promise<any> {
-    // Balance Available: http://lcd.testnet-2.bitsong.network/bank/balances/bitsong1hpl6843jmrw29mp485wz5m27mqm6lnh8utw3le
-    // Balance Delegations: http://lcd.testnet-2.bitsong.network/staking/delegators/bitsong1hpl6843jmrw29mp485wz5m27mqm6lnh8utw3le/delegations
-    // Balance Unbonding: http://lcd.testnet-2.bitsong.network/staking/delegators/bitsong1hpl6843jmrw29mp485wz5m27mqm6lnh8utw3le/unbonding_delegations
-    // Balance Rewards: http://lcd.testnet-2.bitsong.network/distribution/delegators/bitsong1hpl6843jmrw29mp485wz5m27mqm6lnh8utw3le/rewards
-    // Balance Commission (only validators): http://lcd.testnet-2.bitsong.network/distribution/validators/bitsongvaloper18p62z98hrn6h9qyqem7kxy04l8u7a4yv9tc3re/rewards
     return Promise.all([
       axios.get(`${config.get("LCD")}/bank/balances/${address}`),
       axios.get(
@@ -105,11 +100,6 @@ export class Bitsong {
         commissions: 0,
         total: total_balance
       };
-      // [].concat(
-      //   ...validatorGroups[0].data.result,
-      //   ...validatorGroups[1].data.result,
-      //   ...validatorGroups[2].data.result
-      // )
     });
   }
 

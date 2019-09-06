@@ -1,23 +1,24 @@
-# BitSong Blockchain Parser
+# Cosmos SDK Blockchain Parser
 
-BitSong Blockchain Parser in Node.js + MongoDB
+Cosmos SDK Blockchain Parser in Node.js + MongoDB
 
 ## Features
 
-* Parsing entire blockchain
-* Retrieving transactions
+- Parsing entire blockchain
+- Retrieving transactions
 
 ## Install Locally
-* Install required modules:
-  ```$ npm install```
-* Compile TypeScript:
-  ```$ npm run build```
-* Start the app:
-   ```$ node dist/server.js```
+
+- Install required modules:
+  `$ npm install`
+- Compile TypeScript:
+  `$ npm run build`
+- Start the app:
+  `$ node dist/server.js`
 
 ## Authors
 
-* [Angelo Recca](https://github.com/angelorc)
+- [Angelo Recca](https://github.com/angelorc)
 
 ## Contributing
 

@@ -6,7 +6,7 @@ import { ValidatorParser } from "./ValidatorParser";
 import { TransactionParser } from "./TransactionParser";
 import { MessageParser } from "./MessageParser";
 import { AccountParser } from "./AccountParser";
-import { Bitsong } from "../services/Bitsong";
+import { Sdk } from "../services/Sdk";
 import { Config } from "./Config";
 import { setDelay } from "./Utils";
 
@@ -145,7 +145,7 @@ export class BlockchainParser {
           ascending ? number : numberBlocks[i]
         }`
       );
-      return Bitsong.getBlock(number);
+      return Sdk.getBlock(number);
     });
 
     return (

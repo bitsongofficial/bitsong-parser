@@ -4,7 +4,7 @@ import axios from "axios";
 import { Validator } from "../models/ValidatorModel";
 import { Account } from "../models/AccountModel";
 import { IValidator } from "./CommonInterfaces";
-import { Bitsong } from "../services/Bitsong";
+import { Sdk } from "../services/Sdk";
 import { getAddress } from "tendermint/lib/pubkey";
 import * as BluebirdPromise from "bluebird";
 import { sha256 } from "js-sha256";
@@ -12,7 +12,7 @@ import { sha256 } from "js-sha256";
 const config = require("config");
 
 export class ValidatorParser {
-  public pubkeyToBech32(pubkey, prefix = "bitsongpub"): any {
+  public pubkeyToBech32(pubkey, prefix): any {
     // '1624DE6420' is ed25519 pubkey prefix
     let pubkeyAminoPrefix = Buffer.from("1624DE6420", "hex");
     let buffer = Buffer.alloc(37);
@@ -38,7 +38,7 @@ export class ValidatorParser {
     return buffer.slice(pubkeyAminoPrefix.length).toString("base64");
   }
 
-  public getDelegatorAddress(operatorAddr, prefix = "bitsong"): any {
+  public getDelegatorAddress(operatorAddr, prefix): any {
     const address = bech32.decode(operatorAddr);
     return bech32.encode(prefix, address.words);
   }
@@ -72,7 +72,7 @@ export class ValidatorParser {
     try {
       const bulkValidators = Validator.collection.initializeUnorderedBulkOp();
       const bulkAccounts = Account.collection.initializeUnorderedBulkOp();
-      const validatorList = await Bitsong.getValidators(block);
+      const validatorList = await Sdk.getValidators(block);
 
       // if (
       //   block %
@@ -87,7 +87,7 @@ export class ValidatorParser {
       //   });
 
       //   for (const account of accounts) {
-      //     let balances = await Bitsong.getBalances(account.address);
+      //     let balances = await Sdk.getBalances(account.address);
       //     balances.height = parseInt(block);
 
       //     bulkAccounts
@@ -104,11 +104,11 @@ export class ValidatorParser {
       for (var i in validatorList.validators) {
         validatorList.validators[i].pub_key.bech32 = this.pubkeyToBech32(
           validatorList.validators[i].pub_key,
-          "bitsongvalconspub"
+          config.get("bech32PrefixConsPub")
         );
       }
 
-      const validatorSet = await Bitsong.getValidatorSet();
+      const validatorSet = await Sdk.getValidatorSet();
 
       for (const validatorRawData of validatorSet) {
         const validatorRaw = validatorList.validators.find(
@@ -202,7 +202,8 @@ export class ValidatorParser {
       details: {
         operatorAddress: validatorData.operator_address,
         delegatorAddress: this.getDelegatorAddress(
-          validatorData.operator_address
+          validatorData.operator_address,
+          config.get("bech32PrefixAccAddr")
         ),
         consensusPubkey: validatorData.consensus_pubkey,
         jailed: validatorData.jailed,

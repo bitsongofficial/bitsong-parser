@@ -3,12 +3,12 @@ import { Account } from "../models/AccountModel";
 import { Transaction } from "../models/TransactionModel";
 import { Validator } from "../models/ValidatorModel";
 import { ITransaction, IAccount } from "./CommonInterfaces";
-import { Bitsong } from "../services/Bitsong";
+import { Sdk } from "../services/Sdk";
 
 export class AccountParser {
   public async parseGenesisAccounts() {
     try {
-      const genesis = await Bitsong.getGenesis();
+      const genesis = await Sdk.getGenesis();
       const accounts = genesis.app_state.accounts.map((account: any) => {
         return {
           address: account.address,

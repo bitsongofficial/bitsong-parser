@@ -1,12 +1,15 @@
 import * as winston from "winston";
 import { Block } from "../models/BlockModel";
 import { IBlock } from "./CommonInterfaces";
-
+import { Sdk } from "../services/Sdk";
+import { MissedBlock } from "../models/MissedBlockModel";
 import { Config } from "./Config";
 import * as Bluebird from "bluebird";
 
+const config = require("config");
+
 export class BlockParser {
-  public parseBlocks(blocks: any) {
+  public async parseBlocks(blocks: any) {
     if (blocks.length === 0) return Promise.resolve();
 
     const extractedBlocks = blocks.flatMap((block: any) => {

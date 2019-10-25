@@ -1,6 +1,6 @@
 {
   "name": "bitsong-parser",
-  "description": "Parser for Cosmos SDK Blockchain",
+  "description": "Parser for BitSong Blockchain",
   "version": "0.0.1",
   "author": "Angelo Recca <hello@bitsong.io>",
   "scripts": {

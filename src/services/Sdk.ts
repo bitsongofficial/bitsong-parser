@@ -18,6 +18,20 @@ export class Sdk {
     return Sdk.bech32ify(address, prefix);
   };
 
+  static operatorAddrToAccoutAddr = (operatorAddr, prefix) => {
+    const address = bech32.decode(operatorAddr);
+    return bech32.encode(prefix, address.words);
+  };
+
+  static pubkeyToBech32 = (pubkey, prefix) => {
+    // '1624DE6420' is ed25519 pubkey prefix
+    let pubkeyAminoPrefix = Buffer.from("1624DE6420", "hex");
+    let buffer = Buffer.alloc(37);
+    pubkeyAminoPrefix.copy(buffer, 0);
+    Buffer.from(pubkey.value, "base64").copy(buffer, pubkeyAminoPrefix.length);
+    return bech32.encode(prefix, bech32.toWords(buffer));
+  };
+
   static async getGenesis(): Promise<any> {
     return await axios.get(`${config.get("RPC")}/genesis`).then(response => {
       return response.data.result.genesis;
@@ -30,7 +44,7 @@ export class Sdk {
     });
   }
 
-  static async getValidators(blockHeight: Number): Promise<any> {
+  static async getValidators(blockHeight: Number) {
     const validators = await axios
       .get(`${config.get("RPC")}/validators?height=${blockHeight}`)
       .then(res => JSON.parse(JSON.stringify(res.data.result)));

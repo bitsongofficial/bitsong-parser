@@ -9,59 +9,43 @@ export class AccountParser {
   public async parseGenesisAccounts() {
     try {
       const genesis = await Sdk.getGenesis();
-      const accounts = genesis.app_state.accounts.map((account: any) => {
-        return {
-          address: account.address,
-          coins: account.coins
-        };
-      });
-      // const gentxs = genesis.app_state.genutil.gentxs.map((gentx: any) => {
-      //   if (gentx.value.msg[0].type === "cosmos-sdk/MsgCreateValidator") {
-      //     return {
-      //       address: gentx.value.msg[0].value.delegator_address,
-      //       consensusPubkey: gentx.value.msg[0].value.pubkey,
-      //       coins: gentx.value.msg[0].value.value
-      //     };
-      //   }
-      // });
+      const accounts = genesis.app_state.auth.accounts.map(
+        async (account: any) => {
+          if (account.type === "cosmos-sdk/Account") {
+            await Account.findOneAndUpdate(
+              { address: account.value.address },
+              { $set: { address: account.value.address } },
+              { upsert: true, new: true }
+            ).exec();
+          }
 
-      for (let account of accounts) {
-        //   const balances = {
-        //     available: parseFloat(account.coins[0].amount),
-        //     delegations: 0,
-        //     unbonding: 0,
-        //     rewards: 0,
-        //     commissions: 0,
-        //     total: parseFloat(account.coins[0].amount),
-        //     height: 0
-        //   };
+          if (account.type === "cosmos-sdk/ValidatorVestingAccount") {
+            await Account.findOneAndUpdate(
+              {
+                address:
+                  account.value.PeriodicVestingAccount.BaseVestingAccount
+                    .BaseAccount.address
+              },
+              {
+                $set: {
+                  address:
+                    account.value.PeriodicVestingAccount.BaseVestingAccount
+                      .BaseAccount.address
+                }
+              },
+              { upsert: true, new: true }
+            ).exec();
 
-        //   const gentx = gentxs.filter(v => v.address === account.address);
+            await Account.findOneAndUpdate(
+              { address: account.value.validator_address },
+              { $set: { address: account.value.validator_address } },
+              { upsert: true, new: true }
+            ).exec();
+          }
+        }
+      );
 
-        //   if (gentx.length > 0) {
-        //     balances.available -= parseFloat(gentx[0].coins.amount);
-        //     balances.delegations += parseFloat(gentx[0].coins.amount);
-
-        //     await Validator.findOneAndUpdate(
-        //       {
-        //         "details.consensusPubkey": gentx[0].consensusPubkey
-        //       },
-        //       {
-        //         $inc: {
-        //           "details.selfDelegated": parseFloat(gentx[0].coins.amount)
-        //         }
-        //       },
-        //       { upsert: true }
-        //     ).exec();
-        //   }
-
-        await Account.findOneAndUpdate(
-          { address: account.address },
-          { $set: { address: account.address } },
-          { upsert: true, new: true }
-        ).exec();
-      }
-
+      // TODO: fix account.length
       winston.info("Processed " + accounts.length + " accounts from genesis.");
     } catch (error) {
       winston.error(`Could not parse genesis accounts with error: ${error}`);

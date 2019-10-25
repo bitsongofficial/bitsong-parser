@@ -1,6 +1,6 @@
-# Cosmos SDK Blockchain Parser
+# BitSong Blockchain Parser
 
-Cosmos SDK Blockchain Parser in Node.js + MongoDB
+BitSong Blockchain Parser in Node.js + MongoDB
 
 ## Features
 

@@ -21,7 +21,8 @@ const messageSchema = new Schema(
     },
     value: {
       type: Object
-    }
+    },
+    createdAt: { type: Date, default: Date.now }
   },
   {
     id: false,

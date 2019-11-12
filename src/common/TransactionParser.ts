@@ -33,7 +33,11 @@ export class TransactionParser {
     debugger;
 
     for (const msg of transaction.msgs) {
-      const doc = new Message({ ...msg, tx_hash: transaction.hash });
+      const doc = new Message({
+        ...msg,
+        tx_hash: transaction.hash,
+        createdAt: transaction.time
+      });
       await doc.save();
 
       msgs.push(doc._id);
@@ -58,16 +62,19 @@ export class TransactionParser {
       for (const signature of signatures) {
         const account = await Account.findOneAndUpdate(
           { address: signature },
-          { $set: { address: signature } },
+          {
+            $set: {
+              address: signature,
+              updatedAt: transaction.time
+            }
+          },
           {
             upsert: true,
             new: true
           }
         );
 
-        debugger;
-
-        transaction.signatures.push(account._id);
+        transaction.signatures.push(signature);
       }
 
       const msgs = await this.parseMessages(transaction);

@@ -249,7 +249,7 @@ export class ValidatorParser {
             updateOne: {
               filter: { height: Number(block_height) },
               update: {
-                $push: { validators: validatorDb._id }
+                $push: { validators: validatorDb.operator_address }
               },
               upsert: true
             }

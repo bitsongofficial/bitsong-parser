@@ -11,7 +11,9 @@ const accountSchema = new Schema(
     },
     balances: {
       type: Object
-    }
+    },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
   },
   {
     id: false,

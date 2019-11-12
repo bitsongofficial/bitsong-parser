@@ -14,7 +14,13 @@ export class AccountParser {
           if (account.type === "cosmos-sdk/Account") {
             await Account.findOneAndUpdate(
               { address: account.value.address },
-              { $set: { address: account.value.address } },
+              {
+                $set: {
+                  address: account.value.address,
+                  createdAt: genesis.genesis_time,
+                  updatedAt: genesis.genesis_time
+                }
+              },
               { upsert: true, new: true }
             ).exec();
           }
@@ -57,13 +63,18 @@ export class AccountParser {
     if (transactions.length === 0) return Promise.resolve();
 
     for (const transaction of transactions) {
+      console.log(transaction);
       const signatures = transaction.signatures;
       if (signatures.length === 0) return Promise.resolve();
 
       for (const signature of signatures) {
         return await Account.findOneAndUpdate(
           { address: signature },
-          { $set: { address: signature } },
+          {
+            $set: {
+              address: signature
+            }
+          },
           {
             upsert: true,
             new: true

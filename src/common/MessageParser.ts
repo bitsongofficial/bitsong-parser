@@ -14,6 +14,7 @@ export class MessageParser {
       if (messages.length === 0) return Promise.resolve();
 
       messages.forEach((message: any) => {
+        message.createdAt = transaction.time;
         Message.findOneAndUpdate({ tx_hash: transaction.hash }, message, {
           upsert: true,
           new: true

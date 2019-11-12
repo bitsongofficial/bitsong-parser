@@ -30,8 +30,8 @@ const transactionSchema = new Schema(
     ],
     signatures: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Account"
+        type: String,
+        index: true
       }
     ],
     status: {
